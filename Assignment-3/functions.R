@@ -51,3 +51,20 @@ strategyReturns <- function(xts_prices, xts_signals) {
   
   return(as.numeric(total_profit))
 }
+
+# Copilot Output
+bollinger_signals <- function(xts_prices, window = 20, k = 2) {
+  # Compute rolling mean and standard deviation
+  ma <- rollapplyr(xts_prices, width = window, FUN = mean, fill = NA, align = "right")
+  sd <- rollapplyr(xts_prices, width = window, FUN = sd, fill = NA, align = "right")
+  
+  # Upper and lower bands
+  upper_band <- ma + k * sd
+  lower_band <- ma - k * sd
+  
+  # Generate signals: 1 = buy, -1 = sell, 0 = hold
+  sig <- ifelse(xts_prices > upper_band, 1,
+                ifelse(xts_prices < lower_band, -1, 0))
+  
+  return(xts(sig, order.by = index(xts_prices)))
+}
